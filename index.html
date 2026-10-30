@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS2 Lua API — Documentation</title>
+<style>
+:root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #5865f2;
+    --accent2: #7289da;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --cyan: #39c5cf;
+    --pink: #db61a2;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+/* ---------- layout ---------- */
+.sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 280px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 20px 12px;
+    z-index: 100;
+}
+.content {
+    margin-left: 280px;
+    max-width: 920px;
+    padding: 40px 48px 100px;
+}
+@media (max-width: 900px) {
+    .sidebar { display: none; }
+    .content { margin-left: 0; padding: 20px 16px 80px; }
+    .mobile-nav {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    .mobile-nav a {
+        font-size: 12px;
+        padding: 4px 10px;
+        background: var(--bg3);
+        border-radius: 12px;
+        color: var(--muted);
+        text-decoration: none;
+    }
+}
+.mobile-nav { display: none; }
+
+/* ---------- sidebar ---------- */
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    padding: 0 8px 16px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.logo .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+.logo span { color: var(--muted); font-weight: 400; font-size: 13px; }
+
+.search-box {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    margin-bottom: 16px;
+    outline: none;
+    font-family: inherit;
+}
+.search-box:focus { border-color: var(--accent); }
+.search-box::placeholder { color: var(--muted); }
+
+.nav-section {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 14px 8px 6px;
+}
+.nav-link {
+    display: block;
+    padding: 5px 8px 5px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13.5px;
+    border-radius: 4px;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+}
+.nav-link:hover { color: var(--text); background: var(--bg3); }
+.nav-link.active { color: var(--accent2); border-left-color: var(--accent); background: rgba(88,101,242,0.08); }
+
+/* ---------- typography ---------- */
+h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+h1 .version { font-size: 13px; color: var(--muted); font-weight: 400; margin-left: 12px; }
+h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 48px 0 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+h2 .tag {
+    font-size: 11px;
+    background: rgba(88,101,242,0.15);
+    color: var(--accent2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+h2 .count { font-size: 13px; color: var(--muted); font-weight: 400; }
+h3 {
+    font-size: 17px;
+    margin: 32px 0 8px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    color: var(--cyan);
+}
+h3 .ret { color: var(--muted); font-size: 13px; font-family: inherit; }
+p { margin: 8px 0; color: var(--text); }
+p.desc { color: var(--muted); margin: 2px 0 12px; }
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------- code ---------- */
+code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--bg3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--pink);
+}
+pre {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    margin: 10px 0 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    position: relative;
+}
+pre code { background: none; padding: 0; color: var(--text); font-size: 13px; }
+
+/* syntax colors */
+.kw { color: #ff7b72; }          /* keywords */
+.str { color: #a5d6ff; }         /* strings */
+.num { color: #79c0ff; }         /* numbers */
+.cm { color: #8b949e; font-style: italic; } /* comments */
+.fn { color: #d2a8ff; }          /* function calls */
+.api { color: #79c0ff; }         /* api tables */
+.ret { color: #7ee787; }         /* returns */
+.gbl { color: #ffa657; }         /* globals */
+
+.copy-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+pre:hover .copy-btn { opacity: 1; }
+.copy-btn:hover { color: var(--text); border-color: var(--accent); }
+.copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+/* ---------- function entries ---------- */
+.fn-entry {
+    margin: 12px 0 20px;
+    padding: 14px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.fn-entry .signature {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13.5px;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+.fn-entry .signature .fname { color: var(--cyan); font-weight: 600; }
+.fn-entry .signature .arg { color: var(--yellow); }
+.fn-entry .signature .rtn { color: var(--green); }
+.fn-entry .desc { color: var(--muted); font-size: 13.5px; margin: 6px 0; }
+.fn-entry .notes { color: var(--yellow); font-size: 12.5px; margin-top: 6px; }
+
+/* ---------- tables ---------- */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0 20px;
+    font-size: 13.5px;
+}
+th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+}
+th { background: var(--bg3); color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+td { color: var(--text); }
+td code { white-space: nowrap; }
+
+/* ---------- badges ---------- */
+.badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+.badge.read { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge.write { background: rgba(248,81,73,0.15); color: var(--red); }
+.badge.new { background: rgba(88,101,242,0.15); color: var(--accent2); }
+
+/* ---------- misc ---------- */
+.intro-card {
+    background: linear-gradient(135deg, rgba(88,101,242,0.08), rgba(114,137,218,0.04));
+    border: 1px solid rgba(88,101,242,0.25);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+}
+.intro-card h2 { border: none; margin: 0 0 12px; padding: 0; }
+
+.warning {
+    background: rgba(210,153,34,0.08);
+    border: 1px solid rgba(210,153,34,0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 13.5px;
+    color: var(--yellow);
+}
+.warning strong { color: #e3b341; }
+
+.hidden-by-search { display: none !important; }
+.search-status {
+    padding: 12px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: var(--muted);
+    font-size: 13.5px;
+    display: none;
+}
+.search-status.show { display: block; }
+
+.footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12.5px;
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-nav">
+    <a href="#getting-started">Start</a>
+    <a href="#events">Events</a>
+    <a href="#client">Client</a>
+    <a href="#game">Game</a>
+    <a href="#bomb">Bomb</a>
+    <a href="#entity">Entity</a>
+    <a href="#input">Input</a>
+    <a href="#render">Render</a>
+    <a href="#ui">UI</a>
+    <a href="#config">Config</a>
+    <a href="#memory">Memory</a>
+    <a href="#fs">FS</a>
+    <a href="#utils">Utils</a>
+    <a href="#constants">Constants</a>
+    <a href="#examples">Examples</a>
+</div>
+
+<nav class="sidebar">
+    <div class="logo"><div class="dot"></div>CS2 Lua API <span>v2.0</span></div>
+    <input type="text" class="search-box" placeholder="Rechercher..." id="search" oninput="filterApi(this.value)">
+
+    <div class="nav-section">Introduction</div>
+    <a class="nav-link" href="#getting-started">Démarrage rapide</a>
+    <a class="nav-link" href="#events">Événements</a>
+
+    <div class="nav-section">Runtime</div>
+    <a class="nav-link" href="#client">client</a>
+    <a class="nav-link" href="#game">game</a>
+    <a class="nav-link" href="#bomb">bomb</a>
+    <a class="nav-link" href="#entity">entity</a>
+    <a class="nav-link" href="#input">input</a>
+
+    <div class="nav-section">Interface</div>
+    <a class="nav-link" href="#render">render</a>
+    <a class="nav-link" href="#ui">ui</a>
+    <a class="nav-link" href="#config">config</a>
+
+    <div class="nav-section">Bas niveau</div>
+    <a class="nav-link" href="#memory">memory</a>
+    <a class="nav-link" href="#fs">fs</a>
+    <a class="nav-link" href="#utils">utils & math</a>
+
+    <div class="nav-section">Référence</div>
+    <a class="nav-link" href="#constants">Constantes</a>
+    <a class="nav-link" href="#offsets">Table des offsets</a>
+    <a class="nav-link" href="#examples">Exemples complets</a>
+</nav>
+
+<main class="content">
+<div class="search-status" id="searchStatus"></div>
+
+<h1>CS2 Lua API <span class="version">build 1.41.9.2 — 30/10/2026</span></h1>
+
+<div class="intro-card">
+    <h2>Scripting du cheat en Lua</h2>
+    <p>Le cheat embarque un moteur Lua 5.4 complet. Les scripts sont chargés depuis le tab <strong>Lua</strong> du menu (bouton <strong>Run</strong>), ou placés dans <code>Documents/gamesense-cs2/scripts/</code>.</p>
+    <p style="margin-top:8px">L'API expose <strong>80+ fonctions</strong> couvrant le rendu, les entités, la mémoire du jeu, la bombe, les angles de vue, la configuration et des widgets de menu natifs.</p>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="getting-started">Démarrage rapide <span class="tag">basics</span></h2>
+
+<p>Un script Lua s'exécute une fois au chargement (le code top-level), puis s'enregistre sur des événements via des callbacks. L'état persiste entre les frames dans les variables locales et globales du script.</p>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copier</button><code><span class="cm">-- script minimal : affiche un texte en haut à gauche</span>
+<span class="gbl">client</span>.<span class="fn">set_event_callback</span>(<span class="str">"paint"</span>, <span class="kw">function</span>()
+    <span class="gbl">render</span>.<span class="fn">text</span>(<span class="str">"hello"</span>, <span class="num">10</span>, <span class="num">10</span>, <span class="num">255</span>, <span class="num">255</span>, <span class="num">255</span>, <span class="num">255</span>, <span class="gbl">TEXT_LEFT</span>)
+<span class="kw">end</span>)</code></pre>
+
+<p class="desc">Structure d'un script typique avec UI et rendu :</p>
+
+<pre><button class="copy-btn" onclick="copyCode(this)">Copier</button><code><span class="cm">-- 1. déclarer l'UI (appelée quand le panneau Script options se dessine)</span>
+<span class="gbl">client</span>.<span class="fn">set_event_callback</span>(<span class="str">"menu"</span>, <span class="kw">function</span>()
+    <span class="kw">local</span> enabled = <span class="gbl">ui</span>.<span class="fn">checkbox</span>(<span class="str">"my_enabled"</span>, <span class="str">"Enabled"</span>, <span class="kw">true</span>)
+    <span class="gbl">_G</span>.CFG = { enabled = enabled }
+<span class="kw">end</span>)
+
+<span class="cm">-- 2. dessiner chaque frame</span>
+<span class="gbl">client</span>.<span class="fn">set_event_callback</span>(<span class="str">"paint"</span>, <span class="kw">function</span>()
+    <span class="kw">if</span> <span class="kw">not</span> <span class="gbl">_G</span>.CFG <span class="kw">or</span> <span class="kw">not</span> <span class="gbl">_G</span>.CFG.enabled <span class="kw">then</span> <span class="kw">return</span> <span class="kw">end</span>
+    <span class="gbl">render</span>.<span class="fn">text</span>(<span class="str">"actif !"</span>, <span class="num">10</span>, <span class="num">10</span>, <span class="num">120</span>, <span class="num">255</span>, <span class="num">120</span>, <span class="num">255</span>, <span class="gbl">TEXT_LEFT</span>)
+<span class="kw">end</span>)</code></pre>
+
+<p class="desc">Écriture de fichiers (persistance des réglages) :</p>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copier</button><code><span class="gbl">fs</span>.<span class="fn">write</span>(<span class="str">"mes_reglages.txt"</span>, <span class="str">"speed=1.5\nmode=2"</span>)
+<span class="kw">local</span> data = <span class="gbl">fs</span>.<span class="fn">read</span>(<span class="str">"mes_reglages.txt"</span>)  <span class="cm">-- nil si absent</span></code></pre>
+
+<!-- ================================================================ -->
+<h2 id="events">Événements <span class="tag">callbacks</span></h2>
+
+<p>Les scripts s'exécutent via des callbacks enregistrés avec <code>client.set_event_callback(event, fn)</code>. Un seul callback par événement (le dernier enregistrement remplace).</p>
+
+<table>
+<tr><th>Événement</th><th>Quand</th><th>Usage typique</th></tr>
+<tr><td><code>"paint"</code></td><td>Chaque frame de rendu</td><td>Dessin overlay (render.*)</td></tr>
+<tr><td><code>"run"</code></td><td>Chaque tick de logique</td><td>Logique, input, mouvements</td></tr>
+<tr><td><code>"menu"</code></td><td>Dessin du panneau Script options</td><td>Widgets ui.* (tab Lua du menu)</td></tr>
+</table>
+
+<div class="warning"><strong>Important :</strong> les widgets <code>ui.*</code> (checkbox, sliders, combo...) ne doivent être appelés <strong>que</strong> dans le callback <code>"menu"</code>. Les fonctions <code>render.*</code> que dans <code>"paint"</code>. <code>game.set_view_angles</code> ne fait rien si le menu est ouvert (protection du freeze d'angles).</div>
+
+<!-- ================================================================ -->
+<h2 id="client">client <span class="tag">runtime</span> <span class="count">13 fonctions</span></h2>
+
+<div class="fn-entry" data-search="screen size resolution écran">
+    <div class="signature"><span class="fname">client.screen_size</span>() → <span class="rtn">w, h</span></div>
+    <div class="desc">Dimensions de la fenêtre de jeu.</div>
+</div>
+<div class="fn-entry" data-search="delta time frametime">
+    <div class="signature"><span class="fname">client.delta_time</span>() → <span class="rtn">dt</span></div>
+    <div class="desc">Durée de la frame précédente en secondes (pour animations indépendantes du framerate).</div>
+</div>
+<div class="fn-entry" data-search="realtime time temps">
+    <div class="signature"><span class="fname">client.realtime</span>() → <span class="rtn">t</span></div>
+    <div class="desc">Temps écoulé depuis l'injection, en secondes (cumul des delta_time). Utile pour animer.</div>
+</div>
+<div class="fn-entry" data-search="in match partie partie en cours">
+    <div class="signature"><span class="fname">client.in_match</span>() → <span class="rtn">bool</span></div>
+    <div class="desc">True si le joueur est dans une partie active (pas menu principal).</div>
+</div>
+<div class="fn-entry" data-search="menu open ouvert">
+    <div class="signature"><span class="fname">client.menu_open</span>() → <span class="rtn">bool</span></div>
+    <div class="desc">True si le menu du cheat est ouvert.</div>
+</div>
+<div class="fn-entry" data-search="notify notification message toast">
+    <div class="signature"><span class="fname">client.notify</span>(<span class="arg">message</span>)</div>
+    <div class="desc">Affiche une notification dans l'EventLogger du jeu (coin écran). Préfixée <code>[lua]</code>.</div>
+</div>
+<div class="fn-entry" data-search="log journal warning erreur">
+    <div class="signature"><span class="fname">client.log</span>(<span class="arg">message</span>, <span class="arg">level?</span>) <span class="badge new">new</span></div>
+    <div class="desc">Comme notify mais avec <code>[!]</code> si level=1 (avertissement).</div>
+</div>
+<div class="fn-entry" data-search="mouse position curseur">
+    <div class="signature"><span class="fname">client.mouse_position</span>() → <span class="rtn">x, y</span></div>
+    <div class="desc">Position de la souris relative à la fenêtre de jeu.</div>
+</div>
+<div class="fn-entry" data-search="script dir directory dossier chemin">
+    <div class="signature"><span class="fname">client.script_dir</span>() → <span class="rtn">path</span></div>
+    <div class="desc">Chemin du dossier scripts : <code>Documents/gamesense-cs2/scripts</code>.</div>
+</div>
+<div class="fn-entry" data-search="set event callback register">
+    <div class="signature"><span class="fname">client.set_event_callback</span>(<span class="arg">event</span>, <span class="arg">fn</span>)</div>
+    <div class="desc">Enregistre une fonction sur un événement (<code>"paint"</code>, <code>"run"</code>, <code>"menu"</code>).</div>
+</div>
+<div class="fn-entry" data-search="has callback check">
+    <div class="signature"><span class="fname">client.has_callback</span>(<span class="arg">event</span>) → <span class="rtn">bool</span></div>
+    <div class="desc">True si un callback est enregistré sur cet événement.</div>
+</div>
+<div class="fn-entry" data-search="clear callbacks unregister">
+    <div class="signature"><span class="fname">client.clear_callbacks</span>()</div>
+    <div class="desc">Supprime tous les callbacks et tout l'état UI du script courant.</div>
+</div>
+<div class="fn-entry" data-search="print console debug">
+    <div class="signature"><span class="fname">print</span>(<span class="arg">...</span>)</div>
+    <div class="desc">Global Lua standard, redirigé vers l'EventLogger avec préfixe <code>[lua]</code>.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="game">game <span class="tag">local player</span> <span class="count">14 fonctions</span></h2>
+
+<p class="desc">État du joueur local — tout est lu par RPM sécurisé, aucune écriture sauf <code>set_view_angles</code>.</p>
+
+<div class="fn-entry" data-search="map name carte nom">
+    <div class="signature"><span class="fname">game.map_name</span>() → <span class="rtn">string</span></div>
+    <div class="desc">Nom de la carte courante (<code>"de_mirage"</code>), nil si pas en partie.</div>
+</div>
+<div class="fn-event" data-search="time curtime serveur heure"></div>
+<div class="fn-entry" data-search="time curtime serveur heure">
+    <div class="signature"><span class="fname">game.time</span>() → <span class="rtn">float</span></div>
+    <div class="desc">Temps serveur actuel (GlobalVars.curtime).</div>
+</div>
+<div class="fn-entry" data-search="view angles pitch yaw roll lecture">
+    <div class="signature"><span class="fname">game.view_angles</span>() → <span class="rtn">pitch, yaw, roll</span></div>
+    <div class="desc">Angles de vue actuels. Trois valeurs de retour.</div>
+</div>
+<div class="fn-entry" data-search="set view angles write pitch yaw ecrire">
+    <div class="signature"><span class="fname">game.set_view_angles</span>(<span class="arg">pitch</span>, <span class="arg">yaw</span>, <span class="arg">roll?</span>) <span class="badge write">write</span></div>
+    <div class="desc">Écrit les angles de vue. Pitch clampé ±89°, yaw normalisé. <strong>Ignoré si le menu est ouvert</strong> (le freeze d'angles du menu a priorité).</div>
+    <pre><button class="copy-btn" onclick="copyCode(this)">Copier</button><code><span class="cm">-- regarder vers un point précis</span>
+<span class="kw">local</span> p, y = <span class="gbl">game</span>.<span class="fn">view_angles</span>()
+<span class="gbl">game</span>.<span class="fn">set_view_angles</span>(p, y + <span class="num">90</span>)  <span class="cm">-- demi-tour</span></code></pre>
+</div>
+<div class="fn-entry" data-search="view punch recoil recul aim punch">
+    <div class="signature"><span class="fname">game.view_punch</span>() → <span class="rtn">x, y, z</span></div>
+    <div class="desc">Punch d'angle actuel (recul visuel). Pour compenser le recul dans un aimbot script : <code>angle - punch</code>.</div>
+</div>
+<div class="fn-entry" data-search="velocity vitesse xyz speed">
+    <div class="signature"><span class="fname">game.velocity</span>() → <span class="rtn">vx, vy, vz</span></div>
+    <div class="desc">Vecteur vitesse du joueur local.</div>
+</div>
+<div class="fn-entry" data-search="flags m_fFlags ducking onground">
+    <div class="signature"><span class="fname">game.flags</span>() → <span class="rtn">int</span></div>
+    <div class="desc">m_fFlags brut. Testez avec <code>game.flags() &amp; FL_ONGROUND</code> ou les helpers ci-dessous.</div>
+</div>
+<div class="fn-entry" data-search="on ground grounded sol">
+    <div class="signature"><span class="fname">game.on_ground</span>() → <span class="rtn">bool</span></div>
+    <div class="desc">True si le joueur touche le sol.</div>
+</div>
+<div class="fn-entry" data-search="crouching ducking accroupi">
+    <div class="signature"><span class="fname">game.crouching</span>() → <span class="rtn">bool</span></div>
+    <div class="desc">True si le joueur est accroupi.</div>
+</div>
+<div class="fn-entry" data-search="shots fired compteur tirs">
+    <div class="signature"><span class="fname">game.shots_fired</span>() → <span class="rtn">int</span></div>
+    <div class="desc">Nombre de tirs depuis le dernier reset (pour la compensation de recul par tir).</div>
+</div>
+<div class="fn-entry" data-search="scoped zoom sniper lunette">
+    <div class="signature"><span class="fname">game.is_scoped</span>() → <span class="rtn">bool</span></div>
+    <div class="desc">True si le zoom est actif.</div>
+</div>
+<div class="fn-entry" data-search="defusing defuse désamorçage">
+    <div class="signature"><span class="fname">game.is_defusing</span>() → <span class="rtn">bool</span></div>
+    <div class="desc">True si le joueur local est en train de désamorcer.</div>
+</div>
+<div class="fn-entry" data-search="active weapon arme gun current">
+    <div class="signature"><span class="fname">game.active_weapon</span>() → <span class="rtn">name, defIndex</span></div>
+    <div class="desc">Nom de l'arme équipée (<code>"AK-47"</code>) et son item definition index. name nil si rien.</div>
+</div>
+<div class="fn-entry" data-search="tick base simulation time">
+    <div class="signature"><span class="fname">game.tick_base</span>() → <span class="rtn">int</span></div>
+    <div class="desc">m_flSimulationTime du pawn local.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="bomb">bomb <span class="tag">c4</span> <span class="count">5 fonctions</span></h2>
+
+<div class="fn-entry" data-search="bomb state état ticking defused exploded">
+    <div class="signature"><span class="fname">bomb.state</span>() → <span class="rtn">"none"|"ticking"|"defused"|"exploded"</span></div>
+    <div class="desc">État de la bombe. Comparez avec les constantes <code>BOMB_TICKING</code> etc.</div>
+</div>
+<div class="fn-entry" data-search="bomb timer countdown compte à rebours temps restant">
+    <div class="signature"><span class="fname">bomb.timer</span>() → <span class="rtn">float</span></div>
+    <div class="desc">Secondes avant explosion. <code>-1</code> si pas posée. Comparez <code>bomb.timer() &lt; 10</code> pour l'urgence.</div>
+</div>
+<div class="fn-entry" data-search="bomb site A B site">
+    <div class="signature"><span class="fname">bomb.site</span>() → <span class="rtn">"A"|"B"</span></div>
+    <div class="desc">Site où la bombe est posée, nil si pas posée.</div>
+</div>
+<div class="fn-entry" data-search="bomb being defused désamorçage en cours">
+    <div class="signature"><span class="fname">bomb.being_defused</span>() → <span class="rtn">bool</span></div>
+    <div class="desc">True si un joueur est en train de désamorcer.</div>
+</div>
+<div class="fn-entry" data-search="bomb defuse progress progression désamorçage">
+    <div class="signature"><span class="fname">bomb.defuse_progress</span>() → <span class="rtn">float</span></div>
+    <div class="desc">Secondes restantes au désamorçage. <code>-1</code> si personne ne défuse.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="entity">entity <span class="tag">players</span> <span class="count">5 fonctions</span></h2>
+
+<div class="fn-entry" data-search="get local player moi joueur local self">
+    <div class="signature"><span class="fname">entity.get_local</span>() → <span class="rtn">playerTable|nil</span></div>
+    <div class="desc">Le joueur local. Nil si pas en partie. Même structure que les autres joueurs.</div>
+</div>
+<div class="fn-entry" data-search="get players enemies liste tous">
+    <div class="signature"><span class="fname">entity.get_players</span>(<span class="arg">enemiesOnly</span>) → <span class="rtn">{playerTable}</span></div>
+    <div class="desc">Tous les joueurs vivants. <code>enemiesOnly=true</code> exclut les coéquipiers. Le local n'est pas inclus.</div>
+</div>
+<div class="fn-entry" data-search="get spectators spectateurs liste">
+    <div class="signature"><span class="fname">entity.get_spectators</span>() → <span class="rtn">{string}</span></div>
+    <div class="desc">Noms des joueurs qui te spectate.</div>
+</div>
+<div class="fn-entry" data-search="get by index entité numéro">
+    <div class="signature"><span class="fname">entity.get_by_index</span>(<span class="arg">index</span>) → <span class="rtn">playerTable|nil</span></div>
+    <div class="desc">Joueur par entity index.</div>
+</div>
+<div class="fn-entry" data-search="count nombre joueurs total">
+    <div class="signature"><span class="fname">entity.count</span>() → <span class="rtn">int</span></div>
+    <div class="desc">Nombre total d'entités joueur (mort compris).</div>
+</div>
+
+<h3>Champs de playerTable</h3>
+<table>
+<tr><th>Champ</th><th>Type</th><th>Description</th></tr>
+<tr><td><code>index</code></td><td>int</td><td>Entity index</td></tr>
+<tr><td><code>name</code></td><td>string</td><td>Nom du joueur</td></tr>
+<tr><td><code>team</code></td><td>int</td><td>2=T, 3=CT (voir <code>TEAM_T</code>/<code>TEAM_CT</code>)</td></tr>
+<tr><td><code>health</code> / <code>armor</code></td><td>int</td><td>Points de vie / armure</td></tr>
+<tr><td><code>alive</code></td><td>bool</td><td>Vivant</td></tr>
+<tr><td><code>local</code></td><td>bool</td><td>Est le joueur local</td></tr>
+<tr><td><code>helmet</code> / <code>defuser</code></td><td>bool</td><td>Équipé casque / kit</td></tr>
+<tr><td><code>weapon</code></td><td>string</td><td>Nom de l'arme active</td></tr>
+<tr><td><code>distance</code></td><td>int</td><td>Distance en unités</td></tr>
+<tr><td><code>steam_id</code></td><td>int</td><td>SteamID64</td></tr>
+<tr><td><code>x</code>, <code>y</code>, <code>z</code></td><td>float</td><td>Position monde (pieds)</td></tr>
+<tr><td><code>head_x</code>, <code>head_y</code>, <code>head_z</code></td><td>float</td><td>Position de la tête (approx)</td></tr>
+</table>
+
+<!-- ================================================================ -->
+<h2 id="input">input <span class="tag">keyboard</span> <span class="count">2 fonctions</span></h2>
+
+<div class="fn-entry" data-search="key down held maintenu appuyé">
+    <div class="signature"><span class="fname">input.key_down</span>(<span class="arg">vk</span>) → <span class="rtn">bool</span></div>
+    <div class="desc">True tant que la touche est maintenue. Utilisez les constantes <code>keys.*</code> ou un VK direct.</div>
+</div>
+<div class="fn-entry" data-search="key pressed pressé edge front montant">
+    <div class="signature"><span class="fname">input.key_pressed</span>(<span class="arg">vk</span>) → <span class="rtn">bool</span></div>
+    <div class="desc">True uniquement à la frame où la touche passe de relevée à enfoncée (front montant).</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="render">render <span class="tag">drawing</span> <span class="count">11 fonctions</span></h2>
+
+<p class="desc">À appeler uniquement dans le callback <code>"paint"</code>. Couleurs en 0-255 RGBA.</p>
+
+<div class="fn-entry" data-search="line ligne draw">
+    <div class="signature"><span class="fname">render.line</span>(<span class="arg">x1, y1, x2, y2</span>, <span class="arg">r, g, b, a</span>)</div>
+    <div class="desc">Ligne entre deux points écran.</div>
+</div>
+<div class="fn-entry" data-search="rect rectangle outline contour">
+    <div class="signature"><span class="fname">render.rect</span>(<span class="arg">x, y, w, h</span>, <span class="arg">r, g, b, a</span>, <span class="arg">thickness?</span>)</div>
+    <div class="desc">Rectangle contour.</div>
+</div>
+<div class="fn-entry" data-search="filled rect rectangle plein">
+    <div class="signature"><span class="fname">render.filled_rect</span>(<span class="arg">x, y, w, h</span>, <span class="arg">r, g, b, a</span>)</div>
+    <div class="desc">Rectangle plein.</div>
+</div>
+<div class="fn-entry" data-search="bordered rect bordure deux couleurs">
+    <div class="signature"><span class="fname">render.bordered_rect</span>(<span class="arg">x, y, w, h</span>, <span class="arg">fr,fg,fb,fa</span>, <span class="arg">br,bg,bb,ba</span>, <span class="arg">borderWidth?</span>)</div>
+    <div class="desc">Rectangle plein avec contour de couleur différente.</div>
+</div>
+<div class="fn-entry" data-search="gradient dégradé">
+    <div class="signature"><span class="fname">render.gradient</span>(<span class="arg">x, y, w, h</span>, <span class="arg">c1(r,g,b,a)</span>, <span class="arg">c2(r,g,b,a)</span>, <span class="arg">vertical?</span>)</div>
+    <div class="desc">Dégradé horizontal (défaut) ou vertical.</div>
+</div>
+<div class="fn-entry" data-search="triangle">
+    <div class="signature"><span class="fname">render.triangle</span>(<span class="arg">x1,y1, x2,y2, x3,y3</span>, <span class="arg">r, g, b, a</span>)</div>
+    <div class="desc">Triangle plein.</div>
+</div>
+<div class="fn-entry" data-search="circle cercle rond">
+    <div class="signature"><span class="fname">render.circle</span>(<span class="arg">x, y, radius</span>, <span class="arg">r, g, b, a</span>, <span class="arg">segments?</span>, <span class="arg">filled?</span>)</div>
+    <div class="desc">Cercle. <code>segments</code> défaut 24, <code>filled</code> défaut false.</div>
+</div>
+<div class="fn-entry" data-search="text texte font draw string écrire">
+    <div class="signature"><span class="fname">render.text</span>(<span class="arg">text</span>, <span class="arg">x, y</span>, <span class="arg">r, g, b, a</span>, <span class="arg">align?</span>)</div>
+    <div class="desc">Texte avec ombre. Align : <code>TEXT_LEFT</code> (défaut), <code>TEXT_CENTER</code>, <code>TEXT_RIGHT</code>.</div>
+</div>
+<div class="fn-entry" data-search="measure text taille largeur">
+    <div class="signature"><span class="fname">render.measure_text</span>(<span class="arg">text</span>) → <span class="rtn">w, h</span></div>
+    <div class="desc">Dimensions du texte rendu (pour centrage dynamique).</div>
+</div>
+<div class="fn-entry" data-search="world to screen projection w2s monde écran">
+    <div class="signature"><span class="fname">render.world_to_screen</span>(<span class="arg">x, y, z</span>) → <span class="rtn">sx, sy | nil</span></div>
+    <div class="desc">Projette un point monde en coordonnées écran. Nil si derrière la caméra.</div>
+</div>
+<div class="fn-entry" data-search="render checkbox checkbox custom dessin overlay">
+    <div class="signature"><span class="fname">ui.render_checkbox</span>(<span class="arg">id, x, y, label</span>, <span class="arg">default?</span>) → <span class="rtn">bool</span> <span class="badge new">ui</span></div>
+    <div class="desc">Checkbox dessinée à une position écran libre (pas dans le menu) — clickable via la souris. Voir section ui.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="ui">ui <span class="tag">menu widgets</span> <span class="count">12 fonctions</span></h2>
+
+<div class="warning"><strong>Contexte :</strong> les widgets s'affichent dans le panneau <strong>Script options</strong> du tab Lua (colonne de droite). Ils ne fonctionnent que dans le callback <code>"menu"</code>. L'état (valeurs) persiste entre les frames automatiquement — appelez-les à chaque frame du callback menu, elles retournent la valeur courante.</div>
+
+<div class="fn-entry" data-search="checkbox case à cocher toggle bool">
+    <div class="signature"><span class="fname">ui.checkbox</span>(<span class="arg">id, label, default?</span>) → <span class="rtn">bool</span></div>
+    <div class="desc">Case à cocher. La valeur initiale est prise au premier appel.</div>
+</div>
+<div class="fn-entry" data-search="slider int curseur entier">
+    <div class="signature"><span class="fname">ui.slider_int</span>(<span class="arg">id, label, min, max, default?</span>) → <span class="rtn">int</span> <span class="badge new">new</span></div>
+    <div class="desc">Slider entier natif du menu.</div>
+</div>
+<div class="fn-entry" data-search="slider float curseur décimal">
+    <div class="signature"><span class="fname">ui.slider_float</span>(<span class="arg">id, label, min, max, default?</span>) → <span class="rtn">float</span> <span class="badge new">new</span></div>
+    <div class="desc">Slider flottant, format <code>%.2f</code>.</div>
+</div>
+<div class="fn-entry" data-search="combo dropdown select sélection liste">
+    <div class="signature"><span class="fname">ui.combo</span>(<span class="arg">id, label, {"Opt1","Opt2",...}, default?</span>) → <span class="rtn">index</span> <span class="badge new">new</span></div>
+    <div class="desc">Liste déroulante (SingleSelect natif). Retourne l'index 1-based.</div>
+</div>
+<div class="fn-entry" data-search="color picker couleur sélecteur">
+    <div class="signature"><span class="fname">ui.color_picker</span>(<span class="arg">id, label, {r=?,g=?,b=?,a=?}</span>) → <span class="rtn">{r,g,b,a}</span> <span class="badge new">new</span></div>
+    <div class="desc">Sélecteur de couleur natif du menu. Retourne une table.</div>
+</div>
+<div class="fn-entry" data-search="keybind touche raccourci bind hotkey">
+    <div class="signature"><span class="fname">ui.keybind</span>(<span class="arg">id, label, defaultVk?</span>) → <span class="rtn">vk</span> <span class="badge new">new</span></div>
+    <div class="desc">Sélecteur de touche natif (style keybind du menu). Retourne le VK code.</div>
+</div>
+<div class="fn-entry" data-search="button bouton">
+    <div class="signature"><span class="fname">ui.button</span>(<span class="arg">id, label</span>) → <span class="rtn">bool</span></div>
+    <div class="desc">True à la frame du clic.</div>
+</div>
+<div class="fn-entry" data-search="label texte statique">
+    <div class="signature"><span class="fname">ui.label</span>(<span class="arg">text</span>, <span class="arg">special?</span>)</div>
+    <div class="desc">Texte statique. <code>special=true</code> pour le style discret/gris.</div>
+</div>
+<div class="fn-entry" data-search="separator séparateur espace">
+    <div class="signature"><span class="fname">ui.separator</span>() <span class="badge new">new</span></div>
+    <div class="desc">Petit espace vertical.</div>
+</div>
+<div class="fn-entry" data-search="get bool set bool valeur état">
+    <div class="signature"><span class="fname">ui.get_bool</span>(<span class="arg">id</span>) / <span class="fname">ui.set_bool</span>(<span class="arg">id, value</span>)</div>
+    <div class="desc">Accès direct à l'état d'une checkbox sans la dessiner.</div>
+</div>
+<div class="fn-entry" data-search="render checkbox overlay custom">
+    <div class="signature"><span class="fname">ui.render_checkbox</span>(<span class="arg">id, x, y, label, default?</span>) → <span class="rtn">bool</span></div>
+    <div class="desc">Checkbox à position écran libre — utilisable dans <code>paint</code>. Clic géré automatiquement.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="config">config <span class="tag">cheat config</span> <span class="count">13 fonctions</span></h2>
+
+<p class="desc">Accès direct à la config du cheat (les mêmes valeurs que le menu utilise). Les clés sont celles des variables internes (voir <code>/logs</code> ou le code du menu pour les noms).</p>
+
+<div class="fn-entry" data-search="config get set bool int float string color">
+    <div class="signature"><span class="fname">config.get_bool</span>(k) · <span class="fname">config.set_bool</span>(k, v)</div>
+    <div class="signature"><span class="fname">config.get_int</span>(k) · <span class="fname">config.set_int</span>(k, v)</div>
+    <div class="signature"><span class="fname">config.get_float</span>(k) · <span class="fname">config.set_float</span>(k, v)</div>
+    <div class="signature"><span class="fname">config.get_string</span>(k) · <span class="fname">config.set_string</span>(k, v)</div>
+    <div class="signature"><span class="fname">config.get_color</span>(k) → <span class="rtn">{r,g,b,a}</span> · <span class="fname">config.set_color</span>(k, t|r, g?, b?, a?)</div>
+    <div class="desc">Lecture/écriture des valeurs de config par clé.</div>
+</div>
+<div class="fn-entry" data-search="bind active keybind actif">
+    <div class="signature"><span class="fname">config.bind_active</span>(<span class="arg">key</span>) → <span class="rtn">bool</span></div>
+    <div class="desc">True si le keybind nommé est actuellement actif (touche enfoncée selon son mode).</div>
+</div>
+<div class="fn-entry" data-search="config load save charger sauver">
+    <div class="signature"><span class="fname">config.load</span>() · <span class="fname">config.save</span>()</div>
+    <div class="desc">Recharge / sauvegarde la config courante du cheat.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="memory">memory <span class="tag">raw</span> <span class="count">7 fonctions</span></h2>
+
+<div class="warning"><strong>Écriture mémoire :</strong> <code>memory.write_*</code> modifie le jeu en direct. Validez les adresses (<code>IsLikelyPtr</code> intégré) et n'écrivez que sur des adresses que vous avez résolues vous-même.</div>
+
+<div class="fn-entry" data-search="get module base address dll">
+    <div class="signature"><span class="fname">memory.get_module</span>(<span class="arg">"client.dll"</span>) → <span class="rtn">address</span></div>
+    <div class="desc">Adresse de base d'un module du jeu.</div>
+</div>
+<div class="fn-entry" data-search="get offset field champ">
+    <div class="signature"><span class="fname">memory.get_offset</span>(<span class="arg">group, field</span>) → <span class="rtn">offset</span></div>
+    <div class="desc">Offset vérifié du build courant. Groupes : <code>client entity pawn csp controller gamerules c4 scene</code>. Voir <a href="#offsets">table complète</a>.</div>
+</div>
+<div class="fn-entry" data-search="read int integer byte word dword qword">
+    <div class="signature"><span class="fname">memory.read_int</span>(<span class="arg">address, size?</span>) → <span class="rtn">int</span> <span class="badge read">read</span></div>
+    <div class="desc">Lit un entier. size : 1/2/4 (défaut)/8 octets.</div>
+</div>
+<div class="fn-entry" data-search="read float">
+    <div class="signature"><span class="fname">memory.read_float</span>(<span class="arg">address</span>) → <span class="rtn">float</span> <span class="badge read">read</span></div>
+    <div class="desc">Lit un flottant 32 bits.</div>
+</div>
+<div class="fn-entry" data-search="read string chaîne">
+    <div class="signature"><span class="fname">memory.read_string</span>(<span class="arg">address, maxLen?</span>) → <span class="rtn">string</span> <span class="badge read">read</span></div>
+    <div class="desc">Lit une chaîne C (défaut 128 chars).</div>
+</div>
+<div class="fn-entry" data-search="write int integer">
+    <div class="signature"><span class="fname">memory.write_int</span>(<span class="arg">address, value, size?</span>) <span class="badge write">write</span></div>
+    <div class="desc">Écrit un entier (1/2/4/8 octets, défaut 4).</div>
+</div>
+<div class="fn-entry" data-search="write float">
+    <div class="signature"><span class="fname">memory.write_float</span>(<span class="arg">address, value</span>) <span class="badge write">write</span></div>
+    <div class="desc">Écrit un flottant 32 bits.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="offsets">Table des offsets <span class="tag">reference</span></h2>
+
+<p class="desc">Disponibles via <code>memory.get_offset(group, name)</code>. Tous vérifiés sur le build 1.41.9.2 installé.</p>
+
+<h3>client</h3>
+<table>
+<tr><th>Nom</th><th>Valeur</th><th>Description</th></tr>
+<tr><td><code>dwEntityList</code></td><td>0x271EB08</td><td>Entity list</td></tr>
+<tr><td><code>dwLocalPlayerController</code></td><td>0x25413F8</td><td>Controller local</td></tr>
+<tr><td><code>dwLocalPlayerPawn</code></td><td>0x25698C8</td><td>Pawn local</td></tr>
+<tr><td><code>dwViewMatrix</code></td><td>0x256F1D0</td><td>Matrice de vue</td></tr>
+<tr><td><code>dwGameRules</code></td><td>0x2569378</td><td>Game rules proxy</td></tr>
+<tr><td><code>dwGlobalVars</code></td><td>0x2234108</td><td>GlobalVars (engine2)</td></tr>
+<tr><td><code>dwPlantedC4</code></td><td>0x24CFB60</td><td>C4 posée</td></tr>
+<tr><td><code>dwViewAngles</code></td><td>0x2580008</td><td>Angles de vue</td></tr>
+<tr><td><code>dwCSGOInput</code></td><td>0x257F980</td><td>Input system</td></tr>
+</table>
+
+<h3>entity / pawn / csp / controller</h3>
+<table>
+<tr><th>Nom</th><th>Valeur</th></tr>
+<tr><td><code>m_iHealth</code> (entity)</td><td>0x34C</td></tr>
+<tr><td><code>m_lifeState</code> (entity)</td><td>0x354</td></tr>
+<tr><td><code>m_iTeamNum</code> (entity)</td><td>0x3E7</td></tr>
+<tr><td><code>m_fFlags</code> (entity)</td><td>0x3F4</td></tr>
+<tr><td><code>m_vecVelocity</code> (entity)</td><td>0x430</td></tr>
+<tr><td><code>m_pGameSceneNode</code> (entity)</td><td>0x330</td></tr>
+<tr><td><code>m_flSimulationTime</code> (entity)</td><td>0x3B8</td></tr>
+<tr><td><code>m_pWeaponServices</code> (pawn)</td><td>0x12F0</td></tr>
+<tr><td><code>m_pCameraServices</code> (pawn)</td><td>0x1328</td></tr>
+<tr><td><code>m_pObserverServices</code> (pawn)</td><td>0x1308</td></tr>
+<tr><td><code>m_bIsScoped</code> (csp)</td><td>0x1EA0</td></tr>
+<tr><td><code>m_bIsDefusing</code> (csp)</td><td>0x1EA2</td></tr>
+<tr><td><code>m_iShotsFired</code> (csp)</td><td>0x1EB8</td></tr>
+<tr><td><code>m_angEyeAngles</code> (csp)</td><td>0x3600</td></tr>
+<tr><td><code>m_ArmorValue</code> (csp)</td><td>0x1ED0</td></tr>
+<tr><td><code>m_hPlayerPawn</code> (controller)</td><td>0x92C</td></tr>
+<tr><td><code>m_bPawnIsAlive</code> (controller)</td><td>0x934</td></tr>
+<tr><td><code>m_steamID</code> (controller)</td><td>0x788</td></tr>
+<tr><td><code>m_iszPlayerName</code> (controller)</td><td>0x6FC</td></tr>
+</table>
+
+<h3>gamerules / c4 / scene</h3>
+<table>
+<tr><th>Nom</th><th>Valeur</th></tr>
+<tr><td><code>m_bBombPlanted</code> (gamerules)</td><td>0x8C7</td></tr>
+<tr><td><code>m_bBombTicking</code> (c4)</td><td>0x1288</td></tr>
+<tr><td><code>m_flC4Blow</code> (c4)</td><td>0x12B8</td></tr>
+<tr><td><code>m_nBombSite</code> (c4)</td><td>0x128C</td></tr>
+<tr><td><code>m_bBeingDefused</code> (c4)</td><td>0x12C4</td></tr>
+<tr><td><code>m_flDefuseCountDown</code> (c4)</td><td>0x12D8</td></tr>
+<tr><td><code>m_bBombDefused</code> (c4)</td><td>0x12DC</td></tr>
+<tr><td><code>m_vecAbsOrigin</code> (scene)</td><td>0xC8</td></tr>
+</table>
+
+<!-- ================================================================ -->
+<h2 id="fs">fs <span class="tag">files</span> <span class="count">3 fonctions</span></h2>
+
+<p class="desc">Sandbox limitée au dossier scripts : <code>Documents/gamesense-cs2/scripts/</code>. Path traversal bloqué.</p>
+
+<div class="fn-entry" data-search="list files liste fichiers">
+    <div class="signature"><span class="fname">fs.list</span>() → <span class="rtn">{string}</span></div>
+    <div class="desc">Noms de tous les fichiers du dossier scripts.</div>
+</div>
+<div class="fn-entry" data-search="read file lire">
+    <div class="signature"><span class="fname">fs.read</span>(<span class="arg">name</span>) → <span class="rtn">string|nil</span></div>
+    <div class="desc">Contenu d'un fichier (max 256 Ko). Nil si absent.</div>
+</div>
+<div class="fn-entry" data-search="write file écrire sauvegarder">
+    <div class="signature"><span class="fname">fs.write</span>(<span class="arg">name, content</span>) → <span class="rtn">bool</span></div>
+    <div class="desc">Écrit un fichier. Extensions autorisées : <code>.lua .txt .json .cfg</code> (sinon <code>.txt</code> forcé).</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="utils">utils & math <span class="tag">helpers</span> <span class="count">7 fonctions</span></h2>
+
+<div class="fn-entry" data-search="distance 3d">
+    <div class="signature"><span class="fname">utils.distance</span>(<span class="arg">x1,y1,z1, x2,y2,z2</span>) → <span class="rtn">float</span></div>
+</div>
+<div class="fn-entry" data-search="clamp min max">
+    <div class="signature"><span class="fname">utils.clamp</span>(<span class="arg">v, min, max</span>) → <span class="rtn">value</span></div>
+</div>
+<div class="fn-entry" data-search="lerp interpolation">
+    <div class="signature"><span class="fname">utils.lerp</span>(<span class="arg">a, b, t</span>) → <span class="rtn">value</span></div>
+</div>
+<div class="fn-entry" data-search="deg rad convert">
+    <div class="signature"><span class="fname">math.deg2rad</span>(<span class="arg">deg</span>) / <span class="fname">math.rad2deg</span>(<span class="arg">rad</span>)</div>
+</div>
+<div class="fn-entry" data-search="normalize yaw angle wrap">
+    <div class="signature"><span class="fname">math.normalize_yaw</span>(<span class="arg">yaw</span>) → <span class="rtn">yaw</span></div>
+    <div class="desc">Ramène un yaw dans [-180, 180].</div>
+</div>
+<div class="fn-entry" data-search="angle diff différence">
+    <div class="signature"><span class="fname">math.angle_diff</span>(<span class="arg">a, b</span>) → <span class="rtn">diff</span></div>
+    <div class="desc">Différence angulaire signée minimale entre deux yaws.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="constants">Constantes <span class="tag">globals</span></h2>
+
+<h3>Équipes & flags</h3>
+<pre><code><span class="gbl">TEAM_SPEC</span> <span class="gbl">TEAM_T</span> <span class="gbl">TEAM_CT</span>
+<span class="gbl">FL_ONGROUND</span> <span class="gbl">FL_DUCKING</span> <span class="gbl">FL_WATERJUMP</span> <span class="gbl">FL_ONTRAIN</span>
+<span class="gbl">FL_INRAIN</span> <span class="gbl">FL_FROZEN</span> <span class="gbl">FL_ATCONTROLS</span> <span class="gbl">FL_CLIENT</span> <span class="gbl">FL_FAKECLIENT</span></code></pre>
+
+<h3>Bombe & texte</h3>
+<pre><code><span class="gbl">BOMB_NONE</span> <span class="gbl">BOMB_TICKING</span> <span class="gbl">BOMB_DEFUSED</span> <span class="gbl">BOMB_EXPLODED</span>
+<span class="gbl">TEXT_LEFT</span> <span class="gbl">TEXT_CENTER</span> <span class="gbl">TEXT_RIGHT</span></code></pre>
+
+<h3>Touche virtuelles (keys.*)</h3>
+<pre><code><span class="gbl">keys</span>.LBUTTON <span class="gbl">keys</span>.RBUTTON <span class="gbl">keys</span>.MBUTTON <span class="gbl">keys</span>.XBUTTON1 <span class="gbl">keys</span>.XBUTTON2
+<span class="gbl">keys</span>.SHIFT <span class="gbl">keys</span>.CONTROL <span class="gbl">keys</span>.ALT <span class="gbl">keys</span>.SPACE <span class="gbl">keys</span>.TAB <span class="gbl">keys</span>.ESCAPE
+<span class="gbl">keys</span>.INSERT <span class="gbl">keys</span>.DELETE <span class="gbl">keys</span>.HOME <span class="gbl">keys</span>.END
+<span class="gbl">keys</span>.LEFT <span class="gbl">keys</span>.UP <span class="gbl">keys</span>.RIGHT <span class="gbl">keys</span>.DOWN
+<span class="gbl">keys</span>.F1 ... <span class="gbl">keys</span>.F12</code></pre>
+
+<!-- ================================================================ -->
+<h2 id="examples">Exemples complets <span class="tag">recipes</span></h2>
+
+<h3>Bomb timer HUD</h3>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copier</button><code><span class="gbl">client</span>.<span class="fn">set_event_callback</span>(<span class="str">"paint"</span>, <span class="kw">function</span>()
+    <span class="kw">if</span> <span class="gbl">bomb</span>.<span class="fn">state</span>() ~= <span class="gbl">BOMB_TICKING</span> <span class="kw">then</span> <span class="kw">return</span> <span class="kw">end</span>
+
+    <span class="kw">local</span> t = <span class="gbl">bomb</span>.<span class="fn">timer</span>()
+    <span class="kw">local</span> w, h = <span class="gbl">client</span>.<span class="fn">screen_size</span>()
+    <span class="kw">local</span> r = t &lt; <span class="num">10</span> <span class="kw">and</span> <span class="num">255</span> <span class="kw">or</span> <span class="num">200</span>
+    <span class="kw">local</span> g = t &lt; <span class="num">10</span> <span class="kw">and</span> <span class="num">50</span> <span class="kw">or</span> <span class="num">200</span>
+
+    <span class="gbl">render</span>.<span class="fn">text</span>(<span class="fn">string.format</span>(<span class="str">"C4 [%s] %.1f"</span>, <span class="gbl">bomb</span>.<span class="fn">site</span>(), t),
+        w/<span class="num">2</span>, h - <span class="num">120</span>, r, g, <span class="num">60</span>, <span class="num">255</span>, <span class="gbl">TEXT_CENTER</span>)
+
+    <span class="kw">if</span> <span class="gbl">bomb</span>.<span class="fn">being_defused</span>() <span class="kw">then</span>
+        <span class="gbl">render</span>.<span class="fn">text</span>(<span class="fn">string.format</span>(<span class="str">"DEFUSING %.1fs"</span>, <span class="gbl">bomb</span>.<span class="fn">defuse_progress</span>()),
+            w/<span class="num">2</span>, h - <span class="num">100</span>, <span class="num">80</span>, <span class="num">180</span>, <span class="num">255</span>, <span class="num">255</span>, <span class="gbl">TEXT_CENTER</span>)
+    <span class="kw">end</span>
+<span class="kw">end</span>)</code></pre>
+
+<h3>Enemy tracker avec world_to_screen</h3>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copier</button><code><span class="gbl">client</span>.<span class="fn">set_event_callback</span>(<span class="str">"paint"</span>, <span class="kw">function</span>()
+    <span class="kw">for</span> _, p <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="gbl">entity</span>.<span class="fn">get_players</span>(<span class="kw">true</span>)) <span class="kw">do</span>
+        <span class="kw">if</span> p.x <span class="kw">then</span>
+            <span class="kw">local</span> sx, sy = <span class="gbl">render</span>.<span class="fn">world_to_screen</span>(p.x, p.y, p.z)
+            <span class="kw">if</span> sx <span class="kw">then</span>
+                <span class="gbl">render</span>.<span class="fn">text</span>(p.name .. <span class="str">" ["</span> .. p.health .. <span class="str">"hp]"</span>,
+                    sx, sy, <span class="num">255</span>, <span class="num">200</span>, <span class="num">80</span>, <span class="num">240</span>, <span class="gbl">TEXT_CENTER</span>)
+            <span class="kw">end</span>
+        <span class="kw">end</span>
+    <span class="kw">end</span>
+<span class="kw">end</span>)</code></pre>
+
+<h3>Menu script complet avec sauvegarde</h3>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copier</button><code><span class="gbl">client</span>.<span class="fn">set_event_callback</span>(<span class="str">"menu"</span>, <span class="kw">function</span>()
+    ui.<span class="fn">label</span>(<span class="str">"== Mon script =="</span>, <span class="kw">true</span>)
+    <span class="kw">local</span> on    = ui.<span class="fn">checkbox</span>(<span class="str">"on"</span>, <span class="str">"Enabled"</span>, <span class="kw">true</span>)
+    <span class="kw">local</span> speed = ui.<span class="fn">slider_float</span>(<span class="str">"spd"</span>, <span class="str">"Speed"</span>, <span class="num">0.1</span>, <span class="num">5.0</span>, <span class="num">1.0</span>)
+    <span class="kw">local</span> mode  = ui.<span class="fn">combo</span>(<span class="str">"mode"</span>, <span class="str">"Mode"</span>, {<span class="str">"Lent"</span>, <span class="str">"Normal"</span>, <span class="str">"Rapide"</span>}, <span class="num">1</span>)
+    <span class="kw">local</span> col   = ui.<span class="fn">color_picker</span>(<span class="str">"col"</span>, <span class="str">"Couleur"</span>, {r=<span class="num">120</span>,g=<span class="num">180</span>,b=<span class="num">255</span>,a=<span class="num">255</span>})
+    <span class="kw">local</span> key   = ui.<span class="fn">keybind</span>(<span class="str">"key"</span>, <span class="str">"Hotkey"</span>, <span class="num">0</span>)
+    <span class="kw">if</span> ui.<span class="fn">button</span>(<span class="str">"save"</span>, <span class="str">"Sauvegarder"</span>) <span class="kw">then</span>
+        <span class="gbl">fs</span>.<span class="fn">write</span>(<span class="str">"mon_script.cfg"</span>,
+            <span class="fn">string.format</span>(<span class="str">"on=%s speed=%.2f mode=%d"</span>, <span class="fn">tostring</span>(on), speed, mode))
+        <span class="gbl">client</span>.<span class="fn">notify</span>(<span class="str">"Sauvegardé !"</span>)
+    <span class="kw">end</span>
+    <span class="gbl">_G</span>.MY = { on = on, speed = speed, mode = mode, col = col, key = key }
+<span class="kw">end</span>)
+
+<span class="gbl">client</span>.<span class="fn">set_event_callback</span>(<span class="str">"paint"</span>, <span class="kw">function</span>()
+    <span class="kw">local</span> M = <span class="gbl">_G</span>.MY
+    <span class="kw">if</span> <span class="kw">not</span> M <span class="kw">or</span> <span class="kw">not</span> M.on <span class="kw">then</span> <span class="kw">return</span> <span class="kw">end</span>
+    <span class="kw">local</span> t = <span class="gbl">client</span>.<span class="fn">realtime</span>() * M.speed
+    <span class="kw">local</span> w, h = <span class="gbl">client</span>.<span class="fn">screen_size</span>()
+    <span class="gbl">render</span>.<span class="fn">filled_rect</span>(<span class="num">0</span>, <span class="num">0</span>, w * (t % <span class="num">1</span>), <span class="num">4</span>,
+        M.col.r, M.col.g, M.col.b, M.col.a)
+<span class="kw">end</span>)</code></pre>
+
+<h3>Reading game memory via offsets</h3>
+<pre><button class="copy-btn" onclick="copyCode(this)">Copier</button><code><span class="gbl">client</span>.<span class="fn">set_event_callback</span>(<span class="str">"paint"</span>, <span class="kw">function</span>()
+    <span class="kw">local</span> client = <span class="gbl">memory</span>.<span class="fn">get_module</span>(<span class="str">"client.dll"</span>)
+    <span class="kw">local</span> pawn  = <span class="gbl">memory</span>.<span class="fn">read_int</span>(client + <span class="gbl">memory</span>.<span class="fn">get_offset</span>(<span class="str">"client"</span>, <span class="str">"dwLocalPlayerPawn"</span>), <span class="num">8</span>)
+    <span class="kw">if</span> pawn == <span class="num">0</span> <span class="kw">then</span> <span class="kw">return</span> <span class="kw">end</span>
+
+    <span class="kw">local</span> hp = <span class="gbl">memory</span>.<span class="fn">read_int</span>(pawn + <span class="gbl">memory</span>.<span class="fn">get_offset</span>(<span class="str">"entity"</span>, <span class="str">"m_iHealth"</span>))
+    <span class="kw">local</span> team = <span class="gbl">memory</span>.<span class="fn">read_int</span>(pawn + <span class="gbl">memory</span>.<span class="fn">get_offset</span>(<span class="str">"entity"</span>, <span class="str">"m_iTeamNum"</span>), <span class="num">1</span>)
+    <span class="gbl">render</span>.<span class="fn">text</span>(<span class="fn">string.format</span>(<span class="str">"HP:%d TEAM:%d"</span>, hp, team),
+        <span class="num">10</span>, <span class="num">200</span>, <span class="num">255</span>, <span class="num">255</span>, <span class="num">255</span>, <span class="num">255</span>, <span class="gbl">TEXT_LEFT</span>)
+<span class="kw">end</span>)</code></pre>
+
+<!-- ================================================================ -->
+<div class="footer">
+    <p>CS2 Lua API — build 1.41.9.2 (23/10/2026) — documentation générée le 30/10/2026</p>
+    <p>Offsets vérifiés sur le binaire local. Après une mise à jour du jeu, vérifiez <code>/api</code> sur Discord pour la doc à jour.</p>
+</div>
+
+</main>
+
+<script>
+// ---- copy buttons ----
+function copyCode(btn) {
+    const code = btn.parentElement.querySelector('code').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        btn.textContent = 'Copié !';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 1500);
+    });
+}
+
+// ---- search filter ----
+function filterApi(query) {
+    const q = query.trim().toLowerCase();
+    const status = document.getElementById('searchStatus');
+    const entries = document.querySelectorAll('.fn-entry');
+    const headings = document.querySelectorAll('h2[id], h3');
+    const pres = document.querySelectorAll('pre');
+
+    if (!q) {
+        entries.forEach(e => e.classList.remove('hidden-by-search'));
+        headings.forEach(h => h.classList.remove('hidden-by-search'));
+        pres.forEach(p => p.classList.remove('hidden-by-search'));
+        document.querySelectorAll('h2').forEach(h => h.style.display = '');
+        document.querySelectorAll('.fn-entry .hidden-by-search').forEach(e => e.classList.remove('hidden-by-search'));
+        status.classList.remove('show');
+        // restore all
+        document.querySelectorAll('.hidden-by-search').forEach(e => e.classList.remove('hidden-by-search'));
+        return;
+    }
+
+    let total = 0, matched = 0;
+    entries.forEach(e => {
+        total++;
+        const hay = (e.textContent + ' ' + (e.dataset.search || '')).toLowerCase();
+        if (hay.includes(q)) { e.classList.remove('hidden-by-search'); matched++; }
+        else e.classList.add('hidden-by-search');
+    });
+
+    status.textContent = `${matched} / ${total} fonctions correspondent à "${query}"`;
+    status.classList.add('show');
+}
+
+// ---- active nav highlighting ----
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = [];
+navLinks.forEach(l => {
+    const target = document.querySelector(l.getAttribute('href'));
+    if (target) sections.push({ link: l, el: target });
+});
+
+if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(l => l.classList.remove('active'));
+                const match = sections.find(s => s.el === entry.target);
+                if (match) match.link.classList.add('active');
+            }
+        });
+    }, { rootMargin: '-80px 0px -70% 0px' });
+    sections.forEach(s => observer.observe(s.el));
+}
+</script>
+</body>
+</html>
